@@ -1,1 +1,86 @@
+#minesweeper logic
+import random
 
+EASYWIDTH, EASYHEIGHT, EASYBOMBS = (9,9,10) # COLUMNS and ROWS and BOMBS of the easy field 
+MEDIUMWIDTH, MEDIUMHEIGHT, MEDIUMBOMBS = (16,16, 40) # COLUMNS and ROWS and BOMBS of the medium field
+HARDWIDTH, HARDHEIGHT, HARDBOMBS = (30,16,99) # COLUMNS and ROWS and BOMBS of the hard field 
+
+BOMB = "B"
+
+# ALL ABOUT THE FIELD BLOCK
+def FieldManage(choice): # Main subroutine for creating fields and placing the bombs
+    if choice == 1:
+        BoardWidth, BoardHeight, AmountOfBombs = EASYWIDTH, EASYHEIGHT, EASYBOMBS
+    if choice == 2:
+        BoardWidth, BoardHeight, AmountOfBombs = MEDIUMWIDTH, MEDIUMHEIGHT, MEDIUMBOMBS       
+    if choice == 3:
+        BoardWidth, BoardHeight, AmountOfBombs = HARDWIDTH, HARDHEIGHT, HARDBOMBS
+    FieldClean, FieldOpen = CreatingField(BoardWidth, BoardHeight)
+
+    for count in range(0, AmountOfBombs): # Placing bombs
+        FieldOpen = PlaceItem(FieldOpen, BoardWidth, BoardHeight)
+    for count2 in range(0, BoardHeight-1):
+        for count3 in range(0, BoardWidth-1):
+            if FieldOpen[count2][count3] != BOMB:
+                FieldOpen[count2][count3] = CheckSurroundingCells(FieldOpen, count2, count3, BoardWidth, BoardHeight)
+
+    return FieldClean, FieldOpen
+
+
+def CreatingField(BoardWidth, BoardHeight): # Creating the two Field arrays
+    FieldClean = [["." for i in range(BoardWidth)] for j in range(BoardHeight)]
+    FieldOpen = [["." for i in range(BoardWidth)] for j in range(BoardHeight)]
+    return FieldClean, FieldOpen
+
+
+# Filling the FieldOpen block
+def GetRandom(BoardWidth, BoardHeight): # Generating random row and column
+    return random.randint(0, BoardWidth - 1), random.randint(0, BoardHeight - 1)
+
+def PlaceItem(FieldOpen, BoardWidth, BoardHeight):
+    RandomColumn, RandomRow = GetRandom(BoardWidth, BoardHeight)
+    while FieldOpen[RandomRow][RandomColumn] != BOMB:
+        FieldOpen[RandomRow][RandomColumn] = BOMB
+    return FieldOpen
+
+def CheckRange(BoardWidth, BoardHeight, Row, Column):
+    StartRow = 0
+    StartColumn = 0
+    if Row == 0:
+        EndRow = 1   
+    else:
+        StartRow = Row - 1
+        if Row == BoardWidth - 1:
+            EndRow = BoardWidth - 1
+        else:
+            EndRow = Row + 1
+    if Column == 0:
+        EndColumn = 1   
+    else:
+        StartColumn = Column - 1
+        if Column == BoardHeight - 1:
+            EndColumn = BoardHeight - 1
+        else:
+            EndColumn = Column + 1
+    return StartRow, EndRow, StartColumn, EndColumn
+
+def CheckSurroundingCells(FieldOpen, column, row, BoardWidth, BoardHeight):
+    Neighbouring = 0
+    StartRow, EndRow, StartColumn, EndColumn = CheckRange(BoardWidth, BoardHeight, row, column)
+
+    for C in range(StartColumn, EndColumn + 1):
+        for R in range(StartRow, EndRow + 1):
+            if FieldOpen[C][R] == BOMB:
+                Neighbouring  += 1
+    if Neighbouring == 0:
+        return "."
+
+    return Neighbouring
+
+
+#---------------------------------------------------------------------------------------------------
+choice = int(input("Easy, Medium, Hard(1,2,3): "))
+
+FieldClean, FieldOpen = FieldManage(choice)
+for row in FieldOpen:
+    print(*row)
