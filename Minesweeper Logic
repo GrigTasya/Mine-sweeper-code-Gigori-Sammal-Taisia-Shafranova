@@ -2,7 +2,7 @@
 import random
 
 EASYWIDTH, EASYHEIGHT, EASYBOMBS = (9,9,10) # COLUMNS and ROWS and BOMBS of the easy field 
-MEDIUMWIDTH, MEDIUMHEIGHT, MEDIUMBOMBS = (16,16, 40) # COLUMNS and ROWS and BOMBS of the medium field
+MEDIUMWIDTH, MEDIUMHEIGHT, MEDIUMBOMBS = (16,16,40) # COLUMNS and ROWS and BOMBS of the medium field
 HARDWIDTH, HARDHEIGHT, HARDBOMBS = (30,16,99) # COLUMNS and ROWS and BOMBS of the hard field 
 
 BOMB = "B"
@@ -19,10 +19,13 @@ def FieldManage(choice): # Main subroutine for creating fields and placing the b
 
     for count in range(0, AmountOfBombs): # Placing bombs
         FieldOpen = PlaceItem(FieldOpen, BoardWidth, BoardHeight)
-    for count2 in range(0, BoardHeight-1):
-        for count3 in range(0, BoardWidth-1):
-            if FieldOpen[count2][count3] != BOMB:
-                FieldOpen[count2][count3] = CheckSurroundingCells(FieldOpen, count2, count3, BoardWidth, BoardHeight)
+    #for row in FieldOpen:
+    #    print(*row)
+    
+    for y in range(0, BoardHeight):
+        for x in range(0, BoardWidth):
+            if FieldOpen[y][x] != BOMB:
+                FieldOpen[y][x] = CheckSurroundingCells(FieldOpen, y, x, BoardWidth, BoardHeight)
 
     return FieldClean, FieldOpen
 
@@ -44,42 +47,29 @@ def PlaceItem(FieldOpen, BoardWidth, BoardHeight):
     return FieldOpen
 
 def CheckRange(BoardWidth, BoardHeight, Row, Column):
-    StartRow = 0
-    StartColumn = 0
-    if Row == 0:
-        EndRow = 1   
-    else:
-        StartRow = Row - 1
-        if Row == BoardWidth - 1:
-            EndRow = BoardWidth - 1
-        else:
-            EndRow = Row + 1
-    if Column == 0:
-        EndColumn = 1   
-    else:
-        StartColumn = Column - 1
-        if Column == BoardHeight - 1:
-            EndColumn = BoardHeight - 1
-        else:
-            EndColumn = Column + 1
+    StartRow = max(0, Row - 1)
+    EndRow = min(BoardHeight - 1, Row + 1)
+    StartColumn = max(0, Column - 1)
+    EndColumn = min(BoardWidth - 1, Column + 1)
     return StartRow, EndRow, StartColumn, EndColumn
 
-def CheckSurroundingCells(FieldOpen, column, row, BoardWidth, BoardHeight):
+def CheckSurroundingCells(FieldOpen, row, column, BoardWidth, BoardHeight):
     Neighbouring = 0
     StartRow, EndRow, StartColumn, EndColumn = CheckRange(BoardWidth, BoardHeight, row, column)
 
-    for C in range(StartColumn, EndColumn + 1):
-        for R in range(StartRow, EndRow + 1):
-            if FieldOpen[C][R] == BOMB:
+    for R in range(StartRow, EndRow+1):
+        for C in range(StartColumn, EndColumn+1):
+            if FieldOpen[R][C] == BOMB:
                 Neighbouring  += 1
     if Neighbouring == 0:
         return "."
 
-    return Neighbouring
+    return str(Neighbouring)
 
 
 #---------------------------------------------------------------------------------------------------
-choice = int(input("Easy, Medium, Hard(1,2,3): "))
+choice = 3
+# choice = int(input("Easy, Medium, Hard(1,2,3): "))
 
 FieldClean, FieldOpen = FieldManage(choice)
 for row in FieldOpen:
