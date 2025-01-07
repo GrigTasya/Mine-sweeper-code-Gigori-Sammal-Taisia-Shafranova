@@ -9,56 +9,66 @@ RED = (255, 0, 0)
 BLACK = (0,0,0)
 LOST_CASE = (134, 62, 7)
 
-def DrawSquare(size, x, y, SquareBackground, SquareBoarders, Window):
-    
-    pygame.draw.rect(Window, SquareBackground, pygame.Rect(x, y, size, size))
-    pygame.draw.rect(Window, SquareBoarders, pygame.Rect(x, y, size, size), 4)
-    #corpse = pygame.image.load("Burned_man.png").convert_alpha()
+# THE NUMBERS
+Num1 = pygame.image.load("Textures\\Number 1.png")
+Num2 = pygame.image.load("Textures\\Number 2.png")
+Num3 = pygame.image.load("Textures\\Number 3.png")
+Num4 = pygame.image.load("Textures\\Number 4.png")
+Num5 = pygame.image.load("Textures\\Number 5.png")
+Num6 = pygame.image.load("Textures\\Number 6.png")
+Num7 = pygame.image.load("Textures\\Number 7.png")
+Num8 = pygame.image.load("Textures\\Number 8.png")
+
+ClosedCell = pygame.image.load("Textures\\closed_cell.png")
+EmptyCell = pygame.image.load("Textures\\empty cell.png")
+
+# THE FACES
+NormalFace = pygame.image.load("Textures\\normal face.png")
+LostFace = pygame.image.load("Textures\\lost face.png")
+CoolFace = pygame.image.load("Textures\\cool face.png")
 
 
-def Draw_cell(FieldClean, FieldOpen, CurrentRow, CurrentColl, SquareX, SquareY, NumberColour, SquareSize, SquaresBackgroundColour, SquaresBoardersColour, Window):
-    DrawSquare(SquareSize, SquareX, SquareY, SquaresBackgroundColour, SquaresBoardersColour, Window)
-    
+# THE MINES AND THE FLAG
+Mine = pygame.image.load("Textures\\mine.png")
+CrossedMine = pygame.image.load("Textures\\crossed mine.png")
+Flag = pygame.image.load("Textures\\red flag.png")
+
+
+
+def Draw_THE_Cell(TypeOfcell, size, x, y, Window):
+    TypeOfcell = pygame.transform.scale(TypeOfcell, (size, size))
+    Window.blit(TypeOfcell, (x,y))
+
+def Draw_cells(FieldClean, FieldOpen, CurrentRow, CurrentColl, SquareX, SquareY, SquareSize, Window):
+
     if FieldClean[CurrentRow][CurrentColl] == ".":
-        # The cell is closed
-        pass
+        # cell is closed
+
+        Draw_THE_Cell(ClosedCell, SquareSize, SquareX, SquareY, Window)
+        
     else:
-        # The cell is openned
-        FontSize = int(SquareSize * 0.8)
-        NumberX = SquareX + (SquareSize / 2) - (FontSize / 6)
-        NumberY = SquareY + (SquareSize / 2) - (FontSize / 4.5)
+        # cell is openned
 
         if FieldClean[CurrentRow][CurrentColl] == FLAG:
-            Draw_on_a_cell(FLAG, NumberX, NumberY, NumberColour, FontSize, Window)
+            Draw_THE_Cell(Flag, SquareSize, SquareX, SquareY, Window)
 
         elif FieldClean[CurrentRow][CurrentColl] == "-":
-            Draw_empty_cell(SquareSize, SquareX, SquareY, Window)
+            # cell is empty
+            Draw_THE_Cell(EmptyCell, SquareSize, SquareX, SquareY, Window)
 
         elif FieldClean[CurrentRow][CurrentColl] == MIS_FLAG:
-            DrawSquare(SquareSize, SquareX, SquareY, LOST_CASE, LOST_CASE, Window)
-            Draw_on_a_cell(FLAG, NumberX, NumberY, NumberColour, FontSize, Window)
+            Draw_THE_Cell(CrossedMine, SquareSize, SquareX, SquareY, Window)
 
         elif FieldOpen[CurrentRow][CurrentColl] != BOMB:
             Num = FieldClean[CurrentRow][CurrentColl]
-            Draw_on_a_cell(Num, NumberX, NumberY, NumberColour, FontSize, Window)
+            Num = NumberDistributor(Num)
+            Draw_THE_Cell(Num, SquareSize, SquareX, SquareY, Window)
 
         elif FieldOpen[CurrentRow][CurrentColl] == BOMB:
-            Num = FieldClean[CurrentRow][CurrentColl]
-            Draw_on_a_cell(Num, NumberX, NumberY, NumberColour, FontSize, Window)
+            Draw_THE_Cell(Mine, SquareSize, SquareX, SquareY, Window)
 
 
-def Draw_on_a_cell(Something, x, y, NumberColour, font_size, screen):
-    font = pygame.font.Font(None, font_size)
-    text = font.render(Something, True, NumberColour)
-    screen.blit(text, (x, y))
-
-
-def Draw_empty_cell(size, x, y, Window):
-    EmptyCellColour = (139,82,8)
-    pygame.draw.rect(Window, EmptyCellColour, pygame.Rect(x, y, size, size))
-
-
-def Draw_the_board(FieldClean, FieldOpen, ScreenWidth, StartX, StartY, NumberColour, SquaresBackgroundColour, SquaresBoardersColour, Window):
+def Draw_the_board(FieldClean, FieldOpen, ScreenWidth, StartX, StartY, Window):
     Rows = len(FieldOpen)
     Cols = len(FieldOpen[0])
     SquareSize = ScreenWidth // Cols
@@ -68,20 +78,56 @@ def Draw_the_board(FieldClean, FieldOpen, ScreenWidth, StartX, StartY, NumberCol
             X_for_square = StartX + j * SquareSize
             Y_for_square = StartY + i * SquareSize
 
-            Draw_cell(FieldClean, FieldOpen, i, j, X_for_square, Y_for_square, NumberColour, SquareSize, SquaresBackgroundColour, SquaresBoardersColour, Window)
+            Draw_cells(FieldClean, FieldOpen, i, j, X_for_square, Y_for_square, SquareSize, Window)
 
 
+def Draw_ChangeDifficulty(Difficulty, Font, Colour, sizex, sizey, screen_width, Window):
 
-def Draw_ChangeDifficulty(Difficulty, Colour, width, height, x, y, colour, Window):
-    corner_radius = 20
-    pygame.draw.rect(Window, colour, (x, y, width, height), border_radius=corner_radius)
-    Font_for_DifficultyChange =  pygame.font.Font(None, 23)
-    ChangeDifficulty = Font_for_DifficultyChange.render(f"{Difficulty}", True, Colour)
-    Window.blit(ChangeDifficulty, (40,20))
+    #ClosedCell = pygame.transform.scale(EmptyCell, (sizex, sizey))
+    # need to find a proper texture
+
+    ChangeDifficulty = Font.render(Difficulty, True, Colour)
+
+    x = 20
+    y = 5
+    #Window.blit(ClosedCell, (x,y))
+    Window.blit(ChangeDifficulty, (x,y))
 
     
+def BombCounter(Font, BombCounter, Colour, screen_width, Window):
+    x = screen_width // 2 - 110
+    Bombs = Font.render(f"{BombCounter:3d}", True, Colour)
+    Window.blit(Bombs, (x, 5))
 
-def BombCounter(BombCounter, Colour, Window):
-    Font_for_Bomb = pygame.font.Font(None, 36)
-    Bombs = Font_for_Bomb.render(f"{BombCounter:3d}", True, Colour)
-    Window.blit(Bombs, (150, 5))
+def draw_face(FaceState, size, screen_width, Window):
+    if FaceState == "Cool":
+        Face = CoolFace
+    elif FaceState == "Lost":
+        Face = LostFace
+    else:
+        Face = NormalFace
+    
+    x = screen_width//2 - 20
+    y = 2.5
+    Face = pygame.transform.scale(Face, (size, size))
+    Window.blit(Face, (x,y))
+
+    pass
+
+def NumberDistributor(Num):
+    if Num == "1":
+        return Num1
+    if Num == "2":
+        return Num2
+    if Num == "3":
+        return Num3
+    if Num == "4":
+        return Num4
+    if Num == "5":
+        return Num5
+    if Num == "6":
+        return Num6
+    if Num == "7":
+        return Num7
+    if Num == "8":
+        return Num8

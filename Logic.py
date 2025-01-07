@@ -231,11 +231,13 @@ def ChangingDifficulty(Difficulty, Screen_Heigth, Screen_Width, SquareSize):
     
     return Difficulty, Screen_Heigth, Screen_Width, SquareSize
 
-def WinCheck(Lost): # doesn't work
+
+def WinCheck(Lost):
     if Lost:
-        return False
+        return False 
     for row in range(len(FieldClean)):
         for col in range(len(FieldClean[row])):
-            if FieldClean[row][col] == ".":
+            if FieldClean[row][col] == "." and FieldOpen[row][col] != BOMB:
                 return False
-    return True
+    if BombCounter >= 0:
+        return True
