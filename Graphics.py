@@ -81,7 +81,7 @@ def Draw_the_board(FieldClean, FieldOpen, ScreenWidth, StartX, StartY, Window):
             Draw_cells(FieldClean, FieldOpen, i, j, X_for_square, Y_for_square, SquareSize, Window)
 
 
-def Draw_ChangeDifficulty(Difficulty, Font, Colour, sizex, sizey, screen_width, Window):
+def Draw_ChangeDifficulty(Difficulty, Font, Colour, Window):
 
     #ClosedCell = pygame.transform.scale(EmptyCell, (sizex, sizey))
     # need to find a proper texture

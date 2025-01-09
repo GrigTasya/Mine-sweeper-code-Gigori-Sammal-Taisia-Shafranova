@@ -44,7 +44,7 @@ Y_for_STOPWATCH = 5
 
 # Gamemode and primary field creation
 Gamemode = "Medium"
-Difficulty_change_Rect = pygame.Rect(30, 5, CHANGE_DIFFICULTY_WIDTH, CHANGE_DIFFICULTY_HEIGHT)
+Difficulty_change_Rect = pygame.Rect(20, 5, CHANGE_DIFFICULTY_WIDTH, CHANGE_DIFFICULTY_HEIGHT)
 FieldClean, FieldOpen, BombCounter = Logic.FieldManage("Medium", True)
 
 # font
@@ -88,11 +88,13 @@ while running:
                     if playing == False:
                         # for the timer and first openned cell
                         
-                        FieldClean, FieldOpen, BombCounter = Logic.FieldManage(Gamemode, primary)
+                        MouseTuple = Logic.GettingMousePos(MouseCoord, START_X, START_Y, SquareSize)
+                        FieldClean, FieldOpen, BombCounter = Logic.FieldManage(Gamemode, primary, MouseTuple)
+
                         playing = True
                         start_time = pygame.time.get_ticks()
 
-                    Lost, BombCounter = Logic.Replacing_cells_in_FieldClean(LEFT,MouseCoord, START_X, START_Y, SquareSize)
+                    Lost, BombCounter = Logic.Replacing_cells_in_FieldClean(LEFT, MouseCoord, START_X, START_Y, SquareSize, BombCounter, FieldOpen, FieldClean)
                     if Lost == True and Won == False:
                         FaceState = "Lost"
 
@@ -109,6 +111,7 @@ while running:
             if Face_rect.collidepoint(MouseCoord):
                 playing = False
                 Lost = False
+                seconds = 0
                 FaceState = "Normal"
                 FieldClean, FieldOpen, BombCounter = Logic.FieldManage(Gamemode, primary)
                 
@@ -120,10 +123,10 @@ while running:
                     if playing == False:
                         # for the timer and first openned cell
                         primary = False
-                        FieldClean, FieldOpen, BombCounter = Logic.FieldManage(2, primary)
+                        FieldClean, FieldOpen, BombCounter = Logic.FieldManage("Medium", primary)
                         playing = True
                         start_time = pygame.time.get_ticks()
-                    Lost, BombCounter = Logic.Replacing_cells_in_FieldClean(RIGHT, MouseCoord, START_X, START_Y, SquareSize)
+                    Lost, BombCounter = Logic.Replacing_cells_in_FieldClean(RIGHT, MouseCoord, START_X, START_Y, SquareSize, BombCounter, FieldOpen, FieldClean)
         
 
 
@@ -133,12 +136,13 @@ while running:
     Graphics.BombCounter(Font, BombCounter, RED, Screen_Width, MyWindow)
 
     # change difficulty button
-    Graphics.Draw_ChangeDifficulty(Gamemode, Font, WHITE, CHANGE_DIFFICULTY_WIDTH, CHANGE_DIFFICULTY_HEIGHT, Screen_Width, MyWindow)
+    Graphics.Draw_ChangeDifficulty(Gamemode, Font, WHITE, MyWindow)
 
 
     
-    Won = Logic.WinCheck(Lost) # doesn't work 
+    Won = Logic.WinCheck(Lost, BombCounter, FieldOpen, FieldClean)
     if Won:
+        Logic.StoreDecision(seconds, Gamemode)
         FaceState = "Cool"
         Lost = True # :)
 
